@@ -41,10 +41,16 @@
 	var logUtils = createCommonjsModule(function (module, exports) {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	function getTime() {
-	    const dateISOString = new Date().toISOString();
+	    const date = new Date();
 	    return isNode()
-	        ? dateISOString
-	        : dateISOString.substring(11, dateISOString.length - 1);
+	        ? date.toISOString()
+	        : pad(date.getHours(), 2)
+	            + ':'
+	            + pad(date.getMinutes(), 2)
+	            + ':'
+	            + pad(date.getMonth(), 2)
+	            + ':'
+	            + pad(date.getMilliseconds(), 3);
 	}
 	exports.getTime = getTime;
 	// https://github.com/sospedra/logatim/blob/master/lib/utils.js#L9
@@ -57,6 +63,11 @@
 	    }
 	}
 	exports.isNode = isNode;
+	function pad(n, width, z) {
+	    z = z || '0';
+	    n = n + '';
+	    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+	}
 	});
 
 	unwrapExports(logUtils);
