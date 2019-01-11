@@ -14,10 +14,16 @@
 	var logFormat = createCommonjsModule(function (module, exports) {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.browserLogFormat = {
-	    debug: `%s %cdebug:`,
-	    error: `%s %cerror:`,
-	    info: `%s %cinfo:`,
-	    warn: `%s %cwarn:`,
+	    debug: '%c%s %cdebug:',
+	    error: '%c%s %cerror:',
+	    info: '%c%s %cinfo:',
+	    warn: '%c%s %cwarn:',
+	};
+	exports.browserTagStyle = {
+	    debug: 'color: blue; font-weight: bold;',
+	    error: 'color: red; font-weight: bold;',
+	    info: 'color: green; font-weight: bold;',
+	    warn: 'color: #efb23d; font-weight: bold;',
 	};
 	exports.nodeLogFormat = {
 	    debug: '%s \x1b[94mdebug\x1b[0m:',
@@ -25,26 +31,20 @@
 	    info: '%s \x1b[32minfo\x1b[0m:',
 	    warn: '%s \x1b[33mwarn\x1b[0m:',
 	};
-	exports.browserLogStyle = {
-	    debug: 'color: blue; font-weight: bold;',
-	    error: 'color: red; font-weight: bold;',
-	    info: 'color: green; font-weight: bold;',
-	    warn: 'color: #efb23d; font-weight: bold;',
-	};
 	});
 
 	unwrapExports(logFormat);
 	var logFormat_1 = logFormat.browserLogFormat;
-	var logFormat_2 = logFormat.nodeLogFormat;
-	var logFormat_3 = logFormat.browserLogStyle;
+	var logFormat_2 = logFormat.browserTagStyle;
+	var logFormat_3 = logFormat.nodeLogFormat;
 
 	var logUtils = createCommonjsModule(function (module, exports) {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	function getTime() {
-	    const date = new Date();
+	    const dateISOString = new Date().toISOString();
 	    return isNode()
-	        ? date.toISOString()
-	        : `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+	        ? dateISOString
+	        : dateISOString.substring(11, dateISOString.length - 1);
 	}
 	exports.getTime = getTime;
 	// https://github.com/sospedra/logatim/blob/master/lib/utils.js#L9
@@ -67,7 +67,13 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 
 
-	function createIsomorphicLoggerMethods(tag) {
+	const NodeIsomorphicLogger = Object.assign({}, createLoggerMethods(), { withTag: (tagLabel) => {
+	        return createLoggerMethods({
+	            tagLabel,
+	        });
+	    } });
+	exports.default = NodeIsomorphicLogger;
+	function createLoggerMethods(tag) {
 	    return {
 	        debug: (...msg) => {
 	            log("debug" /* debug */, tag, ...msg);
@@ -83,12 +89,6 @@
 	        },
 	    };
 	}
-	const IsomorphicLogger = Object.assign({}, createIsomorphicLoggerMethods(), { withTag: (tagLabel) => {
-	        return createIsomorphicLoggerMethods({
-	            tagLabel,
-	        });
-	    } });
-	exports.default = IsomorphicLogger;
 	function log(consoleMethod, tag, ...msg) {
 	    logUtils.isNode()
 	        ? nodeLog(consoleMethod, tag, ...msg)
@@ -97,8 +97,9 @@
 	function browserLog(consoleMethod, tag, ...msg) {
 	    console['log'].apply(this, [
 	        createFormat(consoleMethod),
+	        'color: #999',
 	        logUtils.getTime(),
-	        logFormat.browserLogStyle[consoleMethod],
+	        logFormat.browserTagStyle[consoleMethod],
 	        ...createTag(tag),
 	        ...msg,
 	    ]);

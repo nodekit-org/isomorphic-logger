@@ -1,8 +1,8 @@
 export function getTime() {
-  const date = new Date();
+  const dateISOString = new Date().toISOString();
   return isNode()
-    ? date.toISOString()
-    : `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    ? dateISOString
+    : dateISOString.substring(11, dateISOString.length - 1);
 }
 
 // https://github.com/sospedra/logatim/blob/master/lib/utils.js#L9

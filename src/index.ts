@@ -1,6 +1,6 @@
 import {
   browserLogFormat,
-  browserLogStyle,
+  browserTagStyle,
   ConsoleMethod,
   LogFormat,
   nodeLogFormat,
@@ -10,9 +10,18 @@ import {
   isNode,
 } from './logUtils';
 
+const NodeIsomorphicLogger = {
+  ...createLoggerMethods(),
+  withTag: (tagLabel: string) => {
+    return createLoggerMethods({
+      tagLabel,
+    });
+  },
+};
 
+export default NodeIsomorphicLogger;
 
-function createIsomorphicLoggerMethods(tag?: Tag) {
+function createLoggerMethods(tag?: Tag) {
   return {
     debug: (...msg: any[]) => {
       log(ConsoleMethod.debug, tag, ...msg);
@@ -29,17 +38,6 @@ function createIsomorphicLoggerMethods(tag?: Tag) {
   }
 }
 
-const IsomorphicLogger = {
-  ...createIsomorphicLoggerMethods(),
-  withTag: (tagLabel: string) => {
-    return createIsomorphicLoggerMethods({
-      tagLabel,
-    });
-  },
-};
-
-export default IsomorphicLogger;
-
 function log(consoleMethod: ConsoleMethod, tag?: Tag, ...msg: any[]) {
   isNode() 
     ? nodeLog(consoleMethod, tag, ...msg)
@@ -49,8 +47,9 @@ function log(consoleMethod: ConsoleMethod, tag?: Tag, ...msg: any[]) {
 function browserLog(consoleMethod: ConsoleMethod, tag?: Tag, ...msg: any[]) {
   console['log'].apply(this, [
     createFormat(consoleMethod),
+    'color: #999',
     getTime(),
-    browserLogStyle[consoleMethod],
+    browserTagStyle[consoleMethod],
     ...createTag(tag),
     ...msg,
   ]);

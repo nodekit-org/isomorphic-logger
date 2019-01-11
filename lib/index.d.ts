@@ -1,4 +1,4 @@
-declare const IsomorphicLogger: {
+declare const NodeIsomorphicLogger: {
     withTag: (tagLabel: string) => {
         debug: (...msg: any[]) => void;
         error: (...msg: any[]) => void;
@@ -10,5 +10,5 @@ declare const IsomorphicLogger: {
     info: (...msg: any[]) => void;
     warn: (...msg: any[]) => void;
 };
-export default IsomorphicLogger;
+export default NodeIsomorphicLogger;
 //# sourceMappingURL=index.d.ts.map
